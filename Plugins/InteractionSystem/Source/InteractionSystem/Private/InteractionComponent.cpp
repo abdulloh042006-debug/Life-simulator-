@@ -35,11 +35,13 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
             bIsInteracting = false;
             HoldProgress = 0.0f;
 
-            if (IInteractableInterface* Interactable = Cast<IInteractableInterface>(CurrentLookTarget.Get()))
+            AActor* Target = CurrentLookTarget.Get();
+            AActor* Owner = GetOwner();
+            if (Target && Target->Implements<UInteractableInterface>())
             {
-                AActor* Owner = GetOwner();
-                Interactable->Execute_Interact(CurrentLookTarget.Get(), Owner);
-                OnInteractionCompleted.Broadcast(Owner, CurrentLookTarget.Get());
+                // Use Execute_Interact so Blueprint-only interface implementations work too.
+                IInteractableInterface::Execute_Interact(Target, Owner);
+                OnInteractionCompleted.Broadcast(Owner, Target);
             }
         }
     }
@@ -109,6 +111,21 @@ bool UInteractionComponent::TraceForInteractable(AActor*& OutActor)
     if (!IInteractableInterface::Execute_CanInteract(Hit.GetActor(), Owner))
     {
         return false;
+    }
+
+    // bTraceComplex only changes collision precision; it does not provide line of sight.
+    // Explicitly reject an interactable hidden behind another blocking actor.
+    if (bRequiresLineOfSight)
+    {
+        FCollisionQueryParams LOSParams;
+        LOSParams.AddIgnoredActor(Owner);
+        FHitResult LOSHit;
+        const bool bBlocked = GetWorld()->LineTraceSingleByChannel(
+            LOSHit, Start, Hit.ImpactPoint, InteractionChannel, LOSParams);
+        if (bBlocked && LOSHit.GetActor() != Hit.GetActor())
+        {
+            return false;
+        }
     }
 
     OutActor = Hit.GetActor();
@@ -202,7 +219,8 @@ void UInteractionComponent::TryInteract()
         {
             bIsInteracting = true;
             HoldProgress = 0.0f;
-            HoldTargetDuration = IInteractableInterface::Execute_GetHoldDuration(Target);
+            HoldTargetDuration = FMath::Max(
+                IInteractableInterface::Execute_GetHoldDuration(Target), 0.01f);
             OnInteractionStarted.Broadcast(Owner, Target);
         }
     }
