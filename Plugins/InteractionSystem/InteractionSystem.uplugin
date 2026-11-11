@@ -1,0 +1,23 @@
+{
+    "FileVersion": 3,
+    "Version": 1,
+    "VersionName": "1.0.0",
+    "FriendlyName": "Interaction System",
+    "Description": "Complete interaction system for Unreal Engine 5. Raycast-based object interaction with highlights, prompts, hold-to-interact, and a clean interface pattern. Works with any actor — doors, pickups, NPCs, switches.",
+    "Category": "Code Plugins",
+    "Subcategory": "Gameplay",
+    "CreatedBy": "Dredd",
+    "CreatedByURL": "https://komputermechanic.com",
+    "EngineVersion": "5.8.0",
+    "CanContainContent": false,
+    "IsBetaVersion": false,
+    "Installed": false,
+    "Modules": [
+        {
+            "Name": "InteractionSystem",
+            "Type": "Runtime",
+            "LoadingPhase": "Default",
+            "PlatformAllowList": ["Win64", "Linux", "Mac", "Android", "LinuxArm64"]
+        }
+    ]
+}

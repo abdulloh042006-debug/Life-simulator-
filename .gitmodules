@@ -1,0 +1,6 @@
+[submodule "Plugins/InventorySystem"]
+	path = Plugins/InventorySystem
+	url = https://github.com/DanieltheDeveloper/inventory-plugin-community-version.git
+[submodule "Plugins/DlgSystem"]
+	path = Plugins/DlgSystem
+	url = https://github.com/NotYetGames/DlgSystem.git
